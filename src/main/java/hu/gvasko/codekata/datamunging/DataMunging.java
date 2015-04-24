@@ -3,13 +3,7 @@ package hu.gvasko.codekata.datamunging;
 import hu.gvasko.codekata.datamunging.stringtable.StringRecord;
 import hu.gvasko.codekata.datamunging.stringtable.StringTable;
 
-import java.io.IOException;
-import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.IntSummaryStatistics;
-import java.util.stream.Stream;
+import java.util.List;
 
 /**
  * DataMunging functionality
@@ -18,22 +12,30 @@ import java.util.stream.Stream;
 public class DataMunging {
 
     public static int getDayOfSmallestTemperatureSpread(StringTable table) {
-        StringRecord minRec = null;
-        float minDiff = 0.0f;
-        for (StringRecord rec : table.getAllRecords()) {
-            float diff = Float.parseFloat(rec.get("MxT")) - Float.parseFloat(rec.get("MnT"));
-            if (diff < 0.0f) {
-                throw new RuntimeException("Inconsistent data.");
-            }
-            if (minRec == null || diff < minDiff) {
-                minRec = rec;
-                minDiff = diff;
-            }
-        }
+        StringRecord minRec = getFirstMinDiffRecord(table.getAllRecords(), "MxT", "MnT");
         if (minRec == null) {
             return -1;
         } else {
             return Integer.parseInt(minRec.get("Dy"));
         }
     }
+
+    public static String getTeamOfSmallestDifferenceInGoals(StringTable table) {
+        StringRecord minRec = getFirstMinDiffRecord(table.getRecordsWhere( rec -> !rec.get("Team").startsWith("---")), "F", "A");
+        return minRec.get("Team");
+    }
+
+    private static StringRecord getFirstMinDiffRecord(List<StringRecord> records, String f1, String f2) {
+        StringRecord minRec = null;
+        float minDiff = 0.0f;
+        for (StringRecord rec : records) {
+            float diff = Math.abs(Float.parseFloat(rec.get(f1)) - Float.parseFloat(rec.get(f2)));
+            if (minRec == null || diff < minDiff) {
+                minRec = rec;
+                minDiff = diff;
+            }
+        }
+        return minRec;
+    }
+
 }

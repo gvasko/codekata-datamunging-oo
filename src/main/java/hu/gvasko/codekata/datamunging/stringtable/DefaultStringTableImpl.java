@@ -70,6 +70,9 @@ class DefaultStringTableImpl implements StringTable {
         int beginIndex = 0;
         for (int i = 0; i < columnsLen.length; i++) {
             int endIndex = beginIndex + columnsLen[i];
+            if (endIndex >= line.length()) {
+                endIndex = line.length();
+            }
             strArr[i] = line.substring(beginIndex, endIndex).trim();
             beginIndex = endIndex;
         }
