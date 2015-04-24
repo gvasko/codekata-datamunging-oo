@@ -89,6 +89,7 @@ class DefaultStringTableImpl implements StringTable {
         this.fieldFilters = new ArrayList<>();
     }
 
+    @Override
     public List<StringRecord> getAllRecords() {
         return getRecordsWhere( r -> true );
     }
@@ -97,15 +98,7 @@ class DefaultStringTableImpl implements StringTable {
     public List<StringRecord> getRecordsWhere(Predicate<StringRecord> predicate) {
         List<StringRecord> resultRecords = new ArrayList<>();
         for (String[] rec : this.records) {
-            DefaultStringRecordImpl.Builder recBuilder = DefaultStringRecordImpl.newBuilder();
-            for (int i = 0; i < schema.length; i++) {
-                String value = rec[i];
-                for (FieldFilter f : fieldFilters) {
-                    value = f.executeFilter(schema[i], value);
-                }
-                recBuilder.addField(schema[i], value);
-            }
-            DefaultStringRecordImpl srec = recBuilder.build();
+            StringRecord srec = toStringRecord(rec);
             if (predicate.test(srec)) {
                 resultRecords.add(srec);
             }
@@ -113,6 +106,25 @@ class DefaultStringTableImpl implements StringTable {
         return resultRecords;
     }
 
+    private StringRecord toStringRecord(String[] rec) {
+        DefaultStringRecordImpl.Builder recBuilder = DefaultStringRecordImpl.newBuilder();
+        for (int i = 0; i < schema.length; i++) {
+            String field = schema[i];
+            String value = getFilteredValue(field, rec[i]);
+            recBuilder.addField(field, value);
+        }
+        return recBuilder.build();
+    }
+
+    private String getFilteredValue(String field, String value) {
+        String tmp = value;
+        for (FieldFilter f : fieldFilters) {
+            tmp = f.executeFilter(field, tmp);
+        }
+        return tmp;
+    }
+
+    @Override
     public void addFilter(FieldFilter filter) {
         fieldFilters.add(filter);
     }

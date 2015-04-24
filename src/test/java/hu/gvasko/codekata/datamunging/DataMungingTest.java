@@ -26,7 +26,7 @@ public class DataMungingTest {
     }
 
     @Test
-    public void testARowInWeatherTable() throws IOException, URISyntaxException {
+    public void testRow9InWeatherTable() throws IOException, URISyntaxException {
         StringTable weather = getWeatherTable();
         StringRecord recDay9 = weather.getRecordsWhere( rec -> rec.get("Dy").equals("9")).get(0);
         Assert.assertEquals("32*", recDay9.get("MnT"));
