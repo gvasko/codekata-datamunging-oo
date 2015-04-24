@@ -1,6 +1,12 @@
 package hu.gvasko.codekata.datamunging.stringtable;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
+import java.util.function.Predicate;
 
 /**
  * Default implementation
@@ -13,8 +19,9 @@ class DefaultStringTableImpl implements StringTable {
         private List<String[]> records;
 
         Builder(String... schema) {
+            // TODO: no duplicate names allowed
             this.schema = schema;
-            records = new ArrayList<String[]>();
+            records = new ArrayList<>();
         }
 
         Builder addRecord(String... fields) {
@@ -35,29 +42,75 @@ class DefaultStringTableImpl implements StringTable {
         return new Builder(schema);
     }
 
+    public static StringTable readTable(URI fileLocation, int... columnsLen) throws IOException {
+        try (BufferedReader br = Files.newBufferedReader(Paths.get(fileLocation))) {
+            Builder tableBuilder = null;
+            String line;
+            while ((line = br.readLine()) != null) {
+                if ("".equals(line.trim())) {
+                    continue;
+                }
+                String[] fields = toStringArray(line, columnsLen);
+                if (tableBuilder == null) {
+                    tableBuilder = new Builder(fields);
+                } else {
+                    tableBuilder.addRecord(fields);
+                }
+            }
+            if (tableBuilder == null) {
+                return null;
+            } else {
+                return tableBuilder.build();
+            }
+        }
+    }
+
+    private static String[] toStringArray(String line, int... columnsLen) {
+        String[] strArr = new String[columnsLen.length];
+        int beginIndex = 0;
+        for (int i = 0; i < columnsLen.length; i++) {
+            int endIndex = beginIndex + columnsLen[i];
+            strArr[i] = line.substring(beginIndex, endIndex).trim();
+            beginIndex = endIndex;
+        }
+        return strArr;
+    }
+
     private String[] schema;
     private List<String[]> records;
-    private Map<String,List<FieldFilter>> fieldFilters;
+    private List<FieldFilter> fieldFilters;
 
     DefaultStringTableImpl(String[] sharedSchema, List<String[]> sharedRecords) {
         this.schema = sharedSchema;
         this.records = sharedRecords;
-        this.fieldFilters = new HashMap<String, List<FieldFilter>>();
+        this.fieldFilters = new ArrayList<>();
     }
 
-    public Collection<StringRecord> getAllRecords() {
-        List<StringRecord> allRecords = new ArrayList<StringRecord>();
-        for (String[] rec : records) {
+    public List<StringRecord> getAllRecords() {
+        return getRecordsWhere( r -> true );
+    }
+
+    @Override
+    public List<StringRecord> getRecordsWhere(Predicate<StringRecord> predicate) {
+        List<StringRecord> resultRecords = new ArrayList<>();
+        for (String[] rec : this.records) {
             DefaultStringRecordImpl.Builder recBuilder = DefaultStringRecordImpl.newBuilder();
             for (int i = 0; i < schema.length; i++) {
-                recBuilder.addField(schema[i], rec[i]);
+                String value = rec[i];
+                for (FieldFilter f : fieldFilters) {
+                    value = f.executeFilter(schema[i], value);
+                }
+                recBuilder.addField(schema[i], value);
             }
-            allRecords.add(recBuilder.build());
+            DefaultStringRecordImpl srec = recBuilder.build();
+            if (predicate.test(srec)) {
+                resultRecords.add(srec);
+            }
         }
-        return allRecords;
+        return resultRecords;
     }
 
-    public void addFilter(FieldFilter filter, String... field) {
-
+    public void addFilter(FieldFilter filter) {
+        fieldFilters.add(filter);
     }
 }
