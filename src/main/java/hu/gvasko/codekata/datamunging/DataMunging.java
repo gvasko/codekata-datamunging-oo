@@ -1,7 +1,6 @@
 package hu.gvasko.codekata.datamunging;
 
 import hu.gvasko.codekata.datamunging.stringtable.StringRecord;
-import hu.gvasko.codekata.datamunging.stringtable.StringTable;
 
 import java.util.List;
 

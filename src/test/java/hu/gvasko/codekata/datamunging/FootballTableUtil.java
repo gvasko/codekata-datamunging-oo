@@ -9,6 +9,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 /**
+ * Util class for football table
  * Created by Gvasko on 2015.04.29..
  */
 public class FootballTableUtil {

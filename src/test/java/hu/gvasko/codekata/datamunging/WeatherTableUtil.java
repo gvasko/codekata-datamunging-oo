@@ -10,6 +10,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 /**
+ * Util class for weather table
  * Created by Gvasko on 2015.04.29..
  */
 class WeatherTableUtil {
@@ -31,8 +32,7 @@ class WeatherTableUtil {
 
     public StringTable getWeatherTable() throws IOException, URISyntaxException {
         URL datFile = this.getClass().getResource("weather.dat");
-        StringTable weather = Factory.getInstance().readStringTableFromFile(datFile.toURI(), 5, 6, 6);
-        return weather;
+        return Factory.getInstance().readStringTableFromFile(datFile.toURI(), 5, 6, 6);
     }
 
     public void addFilter(StringTable table) {

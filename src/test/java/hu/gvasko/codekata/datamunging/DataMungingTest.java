@@ -1,8 +1,5 @@
 package hu.gvasko.codekata.datamunging;
 
-import hu.gvasko.codekata.datamunging.DataMunging;
-import hu.gvasko.codekata.datamunging.stringtable.Factory;
-import hu.gvasko.codekata.datamunging.stringtable.FieldFilter;
 import hu.gvasko.codekata.datamunging.stringtable.StringRecord;
 import hu.gvasko.codekata.datamunging.stringtable.StringTable;
 import org.junit.Assert;
@@ -11,7 +8,6 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
 
 /**
  * The exercise as a test
