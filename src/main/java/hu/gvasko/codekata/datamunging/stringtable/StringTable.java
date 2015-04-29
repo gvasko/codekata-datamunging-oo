@@ -10,5 +10,5 @@ import java.util.function.Predicate;
 public interface StringTable {
     List<StringRecord> getAllRecords();
     List<StringRecord> getRecordsWhere(Predicate<StringRecord> predicate);
-    void addFilter(FieldFilter filter);
+    void addFieldEncoder(FieldEncoder encoder);
 }

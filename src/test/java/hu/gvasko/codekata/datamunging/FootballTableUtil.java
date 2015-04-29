@@ -22,11 +22,7 @@ public class FootballTableUtil {
 
     public String getTeamOfSmallestDifferenceInGoals(StringTable table) {
         StringRecord minRec = DataMunging.getFirstMinDiffRecord(table.getRecordsWhere(rec -> !rec.get("Team").startsWith("---")), "F", "A");
-        if (minRec == null) {
-            return "";
-        } else {
-            return minRec.get("Team");
-        }
+        return minRec == null ? "" : minRec.get("Team");
     }
 
 

@@ -27,7 +27,7 @@ public class DataMungingTest {
     @Test
     public void testDayOfSmallestTemperatureSpread() throws IOException, URISyntaxException {
         StringTable weather = weatherTableUtil.getWeatherTable();
-        weatherTableUtil.addFilter(weather);
+        weatherTableUtil.addEncoder(weather);
         Assert.assertEquals(14, weatherTableUtil.getDayOfSmallestTemperatureSpread(weather));
     }
 
@@ -36,7 +36,7 @@ public class DataMungingTest {
         StringTable weather = weatherTableUtil.getWeatherTable();
         StringRecord recDay9 = weather.getRecordsWhere( rec -> rec.get("Dy").equals("9")).get(0);
         Assert.assertEquals("32*", recDay9.get("MnT"));
-        weatherTableUtil.addFilter(weather);
+        weatherTableUtil.addEncoder(weather);
         recDay9 = weather.getRecordsWhere( rec -> rec.get("Dy").equals("9")).get(0);
         Assert.assertEquals("32", recDay9.get("MnT"));
     }

@@ -1,7 +1,7 @@
 package hu.gvasko.codekata.datamunging;
 
 import hu.gvasko.codekata.datamunging.stringtable.Factory;
-import hu.gvasko.codekata.datamunging.stringtable.FieldFilter;
+import hu.gvasko.codekata.datamunging.stringtable.FieldEncoder;
 import hu.gvasko.codekata.datamunging.stringtable.StringRecord;
 import hu.gvasko.codekata.datamunging.stringtable.StringTable;
 
@@ -23,11 +23,7 @@ class WeatherTableUtil {
 
     public int getDayOfSmallestTemperatureSpread(StringTable table) {
         StringRecord minRec = DataMunging.getFirstMinDiffRecord(table.getAllRecords(), "MxT", "MnT");
-        if (minRec == null) {
-            return -1;
-        } else {
-            return Integer.parseInt(minRec.get("Dy"));
-        }
+        return minRec == null ? -1 : Integer.parseInt(minRec.get("Dy"));
     }
 
     public StringTable getWeatherTable() throws IOException, URISyntaxException {
@@ -35,11 +31,11 @@ class WeatherTableUtil {
         return Factory.getInstance().readStringTableFromFile(datFile.toURI(), 5, 6, 6);
     }
 
-    public void addFilter(StringTable table) {
-        table.addFilter(getWeatherSpecificFilter());
+    public void addEncoder(StringTable table) {
+        table.addFieldEncoder(getWeatherSpecificEncoder());
     }
 
-    private static FieldFilter getWeatherSpecificFilter() {
+    private static FieldEncoder getWeatherSpecificEncoder() {
         return (String k, String v) -> "MxT".equals(k) || "MnT".equals(k) ? v.replace('*', ' ').trim() : v;
     }
 

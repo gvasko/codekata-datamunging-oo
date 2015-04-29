@@ -11,16 +11,11 @@ import java.util.List;
 public final class DataMunging {
 
     public static StringRecord getFirstMinDiffRecord(List<StringRecord> records, String f1, String f2) {
-        StringRecord minRec = null;
-        float minDiff = 0.0f;
-        for (StringRecord rec : records) {
-            float diff = Math.abs(Float.parseFloat(rec.get(f1)) - Float.parseFloat(rec.get(f2)));
-            if (minRec == null || diff < minDiff) {
-                minRec = rec;
-                minDiff = diff;
-            }
-        }
-        return minRec;
+        return records.stream().min( (rec1, rec2) -> Float.compare(getDiff(rec1, f1, f2), getDiff(rec2, f1, f2)) ).get();
+    }
+
+    private static float getDiff(StringRecord rec, String f1, String f2) {
+        return Math.abs(Float.parseFloat(rec.get(f1)) - Float.parseFloat(rec.get(f2)));
     }
 
 }

@@ -78,12 +78,12 @@ class DefaultStringTableImpl implements StringTable {
 
     private String[] schema;
     private List<String[]> records;
-    private List<FieldFilter> fieldFilters;
+    private List<FieldEncoder> fieldEncoders;
 
     DefaultStringTableImpl(String[] sharedSchema, List<String[]> sharedRecords) {
         this.schema = sharedSchema;
         this.records = sharedRecords;
-        this.fieldFilters = new ArrayList<>();
+        this.fieldEncoders = new ArrayList<>();
     }
 
     @Override
@@ -107,22 +107,22 @@ class DefaultStringTableImpl implements StringTable {
         DefaultStringRecordImpl.Builder recBuilder = DefaultStringRecordImpl.newBuilder();
         for (int i = 0; i < schema.length; i++) {
             String field = schema[i];
-            String value = getFilteredValue(field, rec[i]);
+            String value = getEncodedValue(field, rec[i]);
             recBuilder.addField(field, value);
         }
         return recBuilder.build();
     }
 
-    private String getFilteredValue(String field, String value) {
+    private String getEncodedValue(String field, String value) {
         String tmp = value;
-        for (FieldFilter f : fieldFilters) {
-            tmp = f.executeFilter(field, tmp);
+        for (FieldEncoder encoder : fieldEncoders) {
+            tmp = encoder.execute(field, tmp);
         }
         return tmp;
     }
 
     @Override
-    public void addFilter(FieldFilter filter) {
-        fieldFilters.add(filter);
+    public void addFieldEncoder(FieldEncoder encoder) {
+        fieldEncoders.add(encoder);
     }
 }
